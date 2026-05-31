@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     nodejs \
-    npm
+    npm \
+    fontconfig
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -37,6 +38,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copy application files
 COPY . .
+
+# Install Vazirmatn font to system fonts
+RUN mkdir -p /usr/share/fonts/truetype/vazirmatn \
+    && cp public/fonts/vazirmatn/ttf/*.ttf /usr/share/fonts/truetype/vazirmatn/ \
+    && fc-cache -f -v
 
 # Install PHP and Node.js dependencies, then build assets
 # (Uncomment the next 3 lines if you are building the image on the server without vendor/node_modules)

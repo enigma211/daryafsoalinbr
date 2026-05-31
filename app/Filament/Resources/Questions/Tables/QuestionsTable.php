@@ -27,6 +27,18 @@ class QuestionsTable
                     ->label('مبحث مقررات')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('edition')
+                    ->label('ویرایش')
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'اول' => 'ویرایش اول',
+                        'دوم' => 'ویرایش دوم',
+                        'سوم' => 'ویرایش سوم',
+                        'چهارم' => 'ویرایش چهارم',
+                        'پنجم' => 'ویرایش پنجم',
+                        default => $state ?? 'نامشخص',
+                    })
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('type')
                     ->label('نوع سوال')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
@@ -142,8 +154,8 @@ class QuestionsTable
                         $record->update(['current_status' => 'needs_revision']);
                     }),
 
-                \Filament\Actions\ViewAction::make(),
-                \Filament\Actions\EditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

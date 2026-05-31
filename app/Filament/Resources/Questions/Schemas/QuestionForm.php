@@ -170,6 +170,16 @@ HTML
                                 ->searchable()
                                 ->preload()
                                 ->required(),
+                            Select::make('edition')
+                                ->label('ویرایش مبحث')
+                                ->options([
+                                    'اول' => 'ویرایش اول',
+                                    'دوم' => 'ویرایش دوم',
+                                    'سوم' => 'ویرایش سوم',
+                                    'چهارم' => 'ویرایش چهارم',
+                                    'پنجم' => 'ویرایش پنجم',
+                                ])
+                                ->required(),
                             Select::make('discipline')
                                 ->label('رشته آزمون')
                                 ->options([
