@@ -21,11 +21,9 @@ services:
     volumes:
       # Mount storage so uploaded files and logs persist across container restarts
       - ./storage:/var/www/html/storage
-      # Mount .env so you can easily change environment variables
-      - ./.env:/var/www/html/.env
 
   db:
-    image: mysql:8.0
+    image: mariadb:10.11
     container_name: laravel_db
     restart: always
     environment:
