@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
+    libicu-dev \
     zip \
     unzip \
     nodejs \
@@ -17,7 +18,8 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+RUN docker-php-ext-configure intl
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
@@ -38,6 +40,7 @@ COPY . .
 
 # Install PHP and Node.js dependencies, then build assets
 # (Uncomment the next 3 lines if you are building the image on the server without vendor/node_modules)
+RUN git config --global --add safe.directory /var/www/html
 RUN composer install --no-dev --optimize-autoloader
 RUN npm install
 RUN npm run build
