@@ -20,6 +20,7 @@ class QuestionForm
             ->components([
                 Section::make('متن سوال و پاسخ')
                     ->description('محتوای سوال و گزینه‌ها')
+                    ->columnSpanFull()
                     ->schema([
                             \Filament\Forms\Components\Placeholder::make('math_hint')
                                 ->hiddenLabel()
@@ -154,6 +155,7 @@ HTML
 
                 Section::make('اطلاعات اولیه')
                     ->description('مبحث، نوع سوال و طبقه‌بندی')
+                    ->columnSpanFull()
                     ->schema([
                             TextInput::make('unique_code')
                                 ->label('کد یکتا')
