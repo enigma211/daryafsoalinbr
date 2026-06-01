@@ -28,6 +28,7 @@ class DesignerPanelProvider extends PanelProvider
             ->path('designer')
             ->login(\App\Filament\Pages\Auth\OtpLogin::class)
             ->brandName('داشبورد طراحان سوال')
+            ->sidebarCollapsibleOnDesktop()
             ->font('Vazirmatn', '/fonts/vazirmatn/Vazirmatn-font-face.css')
             ->colors([
                 'primary' => Color::Amber,

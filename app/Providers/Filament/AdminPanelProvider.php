@@ -29,6 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login(\App\Filament\Pages\Auth\OtpLogin::class)
             ->brandName('سامانه بانک سوالات')
+            ->sidebarCollapsibleOnDesktop()
             ->font('Vazirmatn', '/fonts/vazirmatn/Vazirmatn-font-face.css')
             ->colors([
                 'primary' => Color::Blue,
