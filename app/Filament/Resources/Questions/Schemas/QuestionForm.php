@@ -100,17 +100,17 @@ HTML
                                 ->label('گزینه‌های سوال')
                                 ->schema([
                                     TextInput::make('option_number')
-                                        ->label('شماره گزینه')
                                         ->numeric()
                                         ->required()
-                                        ->disabled()
-                                        ->dehydrated(),
+                                        ->hidden(),
                                     Textarea::make('text')
-                                        ->label('متن گزینه')
+                                        ->hiddenLabel()
+                                        ->placeholder('متن گزینه...')
                                         ->required()
-                                        ->rows(1),
+                                        ->rows(1)
+                                        ->columnSpanFull(),
                                 ])
-                                ->columns(2)
+                                ->grid(2)
                                 ->minItems(4)
                                 ->maxItems(4)
                                 ->default([
@@ -142,13 +142,15 @@ HTML
                                 ->label('پیوست‌ها (تصویر)')
                                 ->schema([
                                     FileUpload::make('file_path')
-                                        ->label('آپلود فایل')
+                                        ->hiddenLabel()
                                         ->directory('question-attachments')
                                         ->preserveFilenames()
                                         ->image() // For images/diagrams
                                         ->maxSize(5120) // 5MB limit
-                                        ->required(),
+                                        ->required()
+                                        ->columnSpanFull(),
                                 ])
+                                ->grid(2)
                                 ->defaultItems(0)
                                 ->columnSpanFull(),
                         ])->columns(2),
