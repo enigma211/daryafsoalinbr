@@ -167,7 +167,7 @@ HTML
                                 ->options(fn () => \App\Models\Category::all()->sortBy(function($category) {
                                     preg_match('/\d+/', $category->topic, $matches);
                                     return $matches ? (int)$matches[0] : 999;
-                                })->pluck('topic', 'id'))
+                                })->pluck('topic', 'id')->toArray())
                                 ->searchable()
                                 ->preload()
                                 ->required(),
