@@ -28,7 +28,7 @@ class DesignerPanelProvider extends PanelProvider
             ->path('designer')
             ->login(\App\Filament\Pages\Auth\OtpLogin::class)
             ->brandName('داشبورد طراحان سوال')
-            ->font('Vazirmatn', asset('fonts/vazirmatn/Vazirmatn-font-face.css'))
+            ->font('Vazirmatn', '/fonts/vazirmatn/Vazirmatn-font-face.css')
             ->colors([
                 'primary' => Color::Amber,
             ])
