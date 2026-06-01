@@ -30,6 +30,10 @@ class DesignerPanelProvider extends PanelProvider
             ->brandName('داشبورد طراحان سوال')
             ->sidebarCollapsibleOnDesktop()
             ->font('Vazirmatn', '/fonts/vazirmatn/Vazirmatn-font-face.css')
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::HEAD_END,
+                fn (): string => '<style>body, .fi-body, * { font-family: "Vazirmatn", Tahoma, sans-serif !important; }</style>'
+            )
             ->colors([
                 'primary' => Color::Amber,
             ])
