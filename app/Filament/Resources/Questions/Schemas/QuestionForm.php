@@ -8,8 +8,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Wizard;
-use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,10 +18,9 @@ class QuestionForm
     {
         return $schema
             ->components([
-                Wizard::make([
-                    Step::make('متن سوال و پاسخ')
-                        ->description('محتوای سوال و گزینه‌ها')
-                        ->schema([
+                Section::make('متن سوال و پاسخ')
+                    ->description('محتوای سوال و گزینه‌ها')
+                    ->schema([
                             \Filament\Forms\Components\Placeholder::make('math_hint')
                                 ->hiddenLabel()
                                 ->content(new \Illuminate\Support\HtmlString(<<<HTML
@@ -154,9 +152,9 @@ HTML
                                 ->columnSpanFull(),
                         ])->columns(2),
 
-                    Step::make('اطلاعات اولیه')
-                        ->description('مبحث، نوع سوال و طبقه‌بندی')
-                        ->schema([
+                Section::make('اطلاعات اولیه')
+                    ->description('مبحث، نوع سوال و طبقه‌بندی')
+                    ->schema([
                             TextInput::make('unique_code')
                                 ->label('کد یکتا')
                                 ->default(fn () => str_pad(mt_rand(100000, 999999), 6, '0', STR_PAD_LEFT))
@@ -215,31 +213,9 @@ HTML
                             TextInput::make('estimated_time')
                                 ->label('زمان پیشنهادی حل (دقیقه)')
                                 ->numeric(),
-                        ])->columns(2),
-                ])
-                ->submitAction(new \Illuminate\Support\HtmlString('<div class="flex w-full justify-center mt-4"><button type="submit" class="fi-btn fi-btn-size-md fi-btn-color-primary bg-primary-600 hover:bg-primary-500 text-white font-bold py-2 px-8 rounded-lg shadow">ذخیره سوال</button></div>'))
-                ->columnSpanFull(),
+                    ])->columns(2),
 
-                \Filament\Forms\Components\Placeholder::make('wizard_customizations')
-                    ->hiddenLabel()
-                    ->content(new \Illuminate\Support\HtmlString('
-                        <style>
-                            /* Center wizard actions */
-                            .fi-wizard-actions { justify-content: center !important; }
-                        </style>
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function() {
-                                const observer = new MutationObserver((mutations) => {
-                                    document.querySelectorAll(".fi-wizard-actions button span").forEach(span => {
-                                        if (span.innerText.trim() === "بعدی") {
-                                            span.innerText = "مرحله بعدی";
-                                        }
-                                    });
-                                });
-                                observer.observe(document.body, { childList: true, subtree: true });
-                            });
-                        </script>
-                    ')),
+
             ]);
     }
 }
