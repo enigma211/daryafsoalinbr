@@ -110,7 +110,6 @@ HTML
                                         ->rows(1)
                                         ->columnSpanFull(),
                                 ])
-                                ->grid(2)
                                 ->minItems(4)
                                 ->maxItems(4)
                                 ->default([
@@ -150,7 +149,6 @@ HTML
                                         ->required()
                                         ->columnSpanFull(),
                                 ])
-                                ->grid(2)
                                 ->defaultItems(0)
                                 ->columnSpanFull(),
                         ])->columns(2),
