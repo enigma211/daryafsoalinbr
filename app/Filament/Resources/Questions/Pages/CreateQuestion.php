@@ -9,14 +9,10 @@ class CreateQuestion extends CreateRecord
 {
     protected static string $resource = QuestionResource::class;
 
-    protected function getFormActions(): array
-    {
-        return [];
-    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['user_id'] = auth()->id();
+        $data['user_id'] = \Illuminate\Support\Facades\Auth::id();
         return $data;
     }
 }

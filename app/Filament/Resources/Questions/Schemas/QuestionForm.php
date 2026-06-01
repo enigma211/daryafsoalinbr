@@ -119,7 +119,6 @@ HTML
                                 ->addable(false)
                                 ->deletable(false)
                                 ->reorderable(false)
-                                ->collapsible()
                                 ->itemLabel(fn (array $state): ?string => $state['option_number'] ? 'گزینه ' . $state['option_number'] : null)
                                 ->columnSpanFull(),
 
@@ -164,8 +163,8 @@ HTML
                                 ->required()
                                 ->unique(ignoreRecord: true),
                             Select::make('category_id')
-                                ->label('مبحث مقررات ملی (مرجع اصلی)')
-                                ->relationship('category', 'topic')
+                                ->label('مبحث مقررات ملی')
+                                ->relationship('category', 'topic', modifyQueryUsing: fn (\Illuminate\Database\Eloquent\Builder $query) => $query->orderBy('id'))
                                 ->searchable()
                                 ->preload()
                                 ->required(),
@@ -204,16 +203,6 @@ HTML
                                 ->placeholder('مثلاً: مبحث 19 ویرایش 5 صفحه 73')
                                 ->required()
                                 ->columnSpanFull(),
-                            Select::make('difficulty_level')
-                                ->label('درجه سختی')
-                                ->options([
-                                    'easy' => 'آسان (ارجاع مستقیم)',
-                                    'medium' => 'متوسط (ترکیبی ساده)',
-                                    'hard' => 'دشوار (چند مرحله‌ای)',
-                                ]),
-                            TextInput::make('estimated_time')
-                                ->label('زمان پیشنهادی حل (دقیقه)')
-                                ->numeric(),
                     ])->columns(2),
 
 

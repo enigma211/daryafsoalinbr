@@ -13,15 +13,11 @@ class EditQuestion extends EditRecord
 {
     protected static string $resource = QuestionResource::class;
 
-    protected function getFormActions(): array
-    {
-        return [];
-    }
 
     protected function getHeaderActions(): array
     {
         /** @var \App\Models\User $user */
-        $user = auth()->user();
+        $user = \Illuminate\Support\Facades\Auth::user();
 
         return [
             \Filament\Actions\Action::make('send_for_review')
@@ -69,7 +65,7 @@ class EditQuestion extends EditRecord
                 ->visible(fn () => in_array($this->record->current_status, ['awaiting_review', 'scientific_review', 'regulations_review']) && $user->hasRole(['Super Admin', 'Exam Manager', 'Scientific Reviewer', 'Regulations Reviewer']))
                 ->action(function (array $data) {
                     $this->record->comments()->create([
-                        'user_id' => auth()->id(),
+                        'user_id' => \Illuminate\Support\Facades\Auth::id(),
                         'comment' => $data['comment'],
                     ]);
                     $this->record->update(['current_status' => 'needs_revision']);
