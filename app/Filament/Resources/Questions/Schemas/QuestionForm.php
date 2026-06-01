@@ -164,7 +164,10 @@ HTML
                                 ->unique(ignoreRecord: true),
                             Select::make('category_id')
                                 ->label('مبحث مقررات ملی')
-                                ->relationship('category', 'topic', modifyQueryUsing: fn (\Illuminate\Database\Eloquent\Builder $query) => $query->orderByRaw('LENGTH(topic)')->orderBy('topic'))
+                                ->options(fn () => \App\Models\Category::all()->sortBy(function($category) {
+                                    preg_match('/\d+/', $category->topic, $matches);
+                                    return $matches ? (int)$matches[0] : 999;
+                                })->pluck('topic', 'id'))
                                 ->searchable()
                                 ->preload()
                                 ->required(),
