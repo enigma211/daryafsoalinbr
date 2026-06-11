@@ -3,179 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>چاپ سوالات آزمون</title>
-    <link href="{{ asset('fonts/vazirmatn/Vazirmatn-font-face.css') }}" rel="stylesheet">
+    <title>چاپ دسته جمعی سوالات</title>
+    <link href="{{ asset('fonts/vazirmatn/Vazirmatn-font-face.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ asset('vendor/katex/katex.min.css') }}">
+    <script defer src="{{ asset('vendor/katex/katex.min.js') }}"></script>
+    <script defer src="{{ asset('vendor/katex/contrib/auto-render.min.js') }}"></script>
     <style>
         body {
-            font-family: 'Vazirmatn', Arial, sans-serif;
-            font-size: 14pt;
-            line-height: 2;
-            margin: 0;
-            padding: 20px;
+            font-family: 'Vazirmatn', sans-serif;
             background: #fff;
             color: #000;
+            padding: 20px;
+            margin: 0;
+            font-size: 14pt;
+            line-height: 2;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .question-wrapper {
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 3px dashed #ccc;
+            page-break-inside: avoid;
+        }
+        .question-wrapper:last-child {
+            border-bottom: none;
         }
         .header {
-            text-align: center;
             border-bottom: 2px solid #000;
             padding-bottom: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .question-block {
-            margin-bottom: 40px;
-            page-break-inside: avoid;
+        .header-title {
+            font-size: 18pt;
+            font-weight: bold;
+        }
+        .code-box {
+            border: 1px solid #000;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 16pt;
         }
         .question-text {
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: justify;
         }
-        .options-container {
-            display: flex;
-            flex-wrap: wrap;
-            margin-right: 20px;
+        .options {
+            margin-bottom: 30px;
         }
         .option {
-            width: 50%; /* دو ستونه */
             margin-bottom: 10px;
-            box-sizing: border-box;
-            padding-left: 10px;
         }
-        .attachments img {
-            max-width: 80%;
-            height: auto;
-            display: block;
-            margin: 15px auto;
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .meta-table th, .meta-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: right;
+            font-size: 12pt;
+        }
+        .meta-table th {
+            background-color: #f5f5f5;
+        }
+        .explanatory {
+            border: 1px solid #000;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #fafafa;
         }
         @media print {
             body {
                 padding: 0;
             }
             .no-print {
-                display: none;
+                display: none !important;
+            }
+            .question-wrapper {
+                page-break-after: always;
+                border-bottom: none;
             }
         }
         .print-btn {
-            background-color: #4CAF50;
+            display: block;
+            width: 250px;
+            margin: 20px auto;
+            padding: 10px;
+            text-align: center;
+            background: #2563eb;
             color: white;
-            padding: 10px 20px;
-            border: none;
+            text-decoration: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            border: none;
             font-family: inherit;
-            margin-bottom: 20px;
-            display: inline-block;
+            font-size: 14pt;
         }
-        .print-btn:hover {
-            background-color: #45a049;
+        
+        /* Fix KaTeX directionality in RTL context */
+        .katex, .katex * {
+            direction: ltr !important;
+            unicode-bidi: isolate;
         }
-        .metadata-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-            font-size: 11pt;
-            background: #f9f9f9;
-        }
-        .metadata-table th, .metadata-table td {
-            border: 1px solid #ccc;
-            padding: 5px;
-            text-align: right;
-        }
-        .metadata-table th {
-            background: #eee;
-            width: 20%;
+        .katex-display {
+            direction: ltr !important;
+            text-align: center !important;
         }
     </style>
 </head>
 <body>
+    <button class="print-btn no-print" onclick="window.print()">چاپ دسته جمعی سوالات</button>
 
-    <div class="no-print" style="text-align: left;">
-        <button class="print-btn" onclick="window.print()">🖨️ چاپ این صفحه (PDF / پرینتر)</button>
-    </div>
-
-    <div class="header">
-        <h1>بسمه تعالی</h1>
-        <h2>دفترچه سوالات آزمون مقررات ملی ساختمان</h2>
-        <p>تعداد سوالات: {{ $questions->count() }} سوال</p>
-    </div>
-
-    @php
-        $disciplines = [
-            'civil' => 'عمران',
-            'architecture' => 'معماری',
-            'electrical' => 'تاسیسات برقی',
-            'mechanical' => 'تاسیسات مکانیکی',
-            'surveying' => 'نقشه‌برداری',
-            'traffic' => 'ترافیک',
-            'urbanism' => 'شهرسازی',
-        ];
-        $qualifications = [
-            'design' => 'طراحی / محاسبات',
-            'supervision' => 'نظارت',
-            'execution' => 'اجرا',
-        ];
-        $skillTypes = [
-            'analysis' => 'تحلیل',
-            'calculation' => 'محاسبه',
-            'regulation_recognition' => 'تشخیص ضابطه',
-            'combined' => 'ترکیبی',
-        ];
-        $difficulties = [
-            'easy' => 'آسان',
-            'medium' => 'متوسط',
-            'hard' => 'دشوار',
-        ];
-    @endphp
-
-    @foreach($questions as $index => $question)
-        <div class="question-block">
-            <div style="font-size: 11pt; color: #555; background: #f9f9f9; padding: 10px; border: 1px solid #ddd; margin-bottom: 15px; border-radius: 5px;">
-                <strong>رشته:</strong> {{ $disciplines[$question->discipline] ?? '-' }} |
-                <strong>صلاحیت:</strong> {{ $qualifications[$question->qualification] ?? '-' }} |
-                <strong>مبحث اصلی:</strong> {{ $question->category->topic ?? '-' }} (ویرایش {{ $question->reference_year ?? '-' }}) |
-                <strong>فصل:</strong> {{ $question->chapter ?? '-' }} <br>
-                <strong>موضوع:</strong> {{ $question->topic_details ?? '-' }} |
-                <strong>مهارت:</strong> {{ $skillTypes[$question->skill_type] ?? '-' }} |
-                <strong>درجه سختی:</strong> {{ $difficulties[$question->difficulty_level] ?? '-' }} |
-                <strong>زمان:</strong> {{ $question->estimated_time ?? '-' }} دقیقه
-                @if($question->other_references)
-                    <br><strong>سایر منابع:</strong> {{ $question->other_references }}
-                @endif
-                @if($question->exact_source)
-                    <br><strong>منبع دقیق:</strong> {{ $question->exact_source }}
-                @endif
+    <div class="container">
+        @foreach($questions as $question)
+        <div class="question-wrapper">
+            <div class="header">
+                <div class="header-title">مشخصات و صورت سوال</div>
+                <div class="code-box">کد یکتا: {{ $question->unique_code }}</div>
             </div>
+
+            <table class="meta-table">
+                <tr>
+                    <th>نام طراح:</th>
+                    <td>{{ $question->designer->name ?? 'نامشخص' }}</td>
+                    <th>مبحث / طبقه‌بندی:</th>
+                    <td>{{ $question->category->topic ?? 'نامشخص' }}</td>
+                </tr>
+                <tr>
+                    <th>تاریخ ثبت:</th>
+                    <td colspan="3">{{ \Morilog\Jalali\Jalalian::fromCarbon($question->created_at)->format('%d %B %Y') }}</td>
+                </tr>
+            </table>
 
             <div class="question-text">
-                {{ $index + 1 }}- {!! $question->text !!}
+                {!! $question->text !!}
             </div>
 
-            @if($question->attachments && $question->attachments->count() > 0)
-                <div class="attachments">
-                    @foreach($question->attachments as $attachment)
-                        <img src="{{ asset('storage/' . $attachment->file_path) }}" alt="پیوست سوال">
-                    @endforeach
-                </div>
+            <div class="options">
+                @foreach($question->options as $index => $option)
+                    <div class="option">
+                        گزینه {{ $index + 1 }}) {!! $option->text !!} 
+                    </div>
+                @endforeach
+            </div>
+
+            @if($question->correct_option)
+            <div class="correct-answer" style="margin-bottom: 20px; font-weight: bold; color: green; font-size: 16pt;">
+                ✅ پاسخ صحیح: گزینه {{ $question->correct_option }}
+            </div>
             @endif
 
-            @if($question->type === 'multiple_choice' && $question->options)
-                <div class="options-container">
-                    @foreach($question->options as $option)
-                        <div class="option">
-                            {{ $option->option_number }}) {{ $option->text }}
-                        </div>
-                    @endforeach
+            @if($question->descriptive_answer)
+            <div class="explanatory">
+                <strong>پاسخ تشریحی:</strong>
+                <div style="margin-top: 10px;">
+                    {!! $question->descriptive_answer !!}
                 </div>
+            </div>
             @endif
-            
-            @if($question->type === 'descriptive')
-                <div style="margin-top: 10px; border: 1px dashed #ccc; height: 150px; padding: 10px; color: #888;">
-                    (محل پاسخ تشریحی)
+
+            @if($question->exact_source || $question->other_references)
+            <div class="explanatory">
+                <strong>مستندات و منابع:</strong>
+                <div style="margin-top: 10px;">
+                    @if($question->exact_source)
+                        <div><strong>آدرس دقیق مبحث:</strong> {{ $question->exact_source }}</div>
+                    @endif
+                    @if($question->other_references)
+                        <div style="margin-top: 5px;"><strong>سایر منابع:</strong> {{ $question->other_references }}</div>
+                    @endif
                 </div>
+            </div>
             @endif
         </div>
-    @endforeach
+        @endforeach
+    </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false},
+                    {left: "\\[", right: "\\]", display: true}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
 </body>
 </html>

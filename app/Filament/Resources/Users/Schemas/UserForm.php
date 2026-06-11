@@ -38,6 +38,16 @@ class UserForm
                     ->label('نقش‌های کاربر')
                     ->multiple()
                     ->relationship('roles', 'name')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => match ($record->name) {
+                        'Super Admin' => 'مدیر کل',
+                        'Exam Manager' => 'مدیر آزمون',
+                        'Field Secretary' => 'دبیر رشته',
+                        'Operator' => 'اپراتور',
+                        'Question Designer' => 'طراح سوال',
+                        'Regulations Reviewer' => 'ناظر مقررات ملی',
+                        'Scientific Reviewer' => 'ناظر علمی',
+                        default => $record->name,
+                    })
                     ->preload(),
                 Select::make('categories')
                     ->label('مباحث تخصصی (مخصوص داوران)')

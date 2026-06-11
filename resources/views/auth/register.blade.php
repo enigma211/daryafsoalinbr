@@ -18,7 +18,6 @@
     <div class="bg-white w-full max-w-md rounded-2xl p-8 shadow-xl">
         <div class="text-center mb-8">
             <h1 class="text-2xl font-bold text-gray-800">ثبت نام طراح سوال</h1>
-            <p class="text-gray-500 mt-2">به سامانه بانک سوالات بپیوندید</p>
         </div>
 
         @if ($errors->any())
@@ -42,11 +41,32 @@
             </div>
 
             <div class="mb-5">
+                <label for="email" class="block text-gray-700 font-medium mb-2">ایمیل</label>
+                <input type="email" id="email" name="email" value="{{ old('email') }}" required dir="ltr"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-left"
+                    placeholder="example@mail.com">
+            </div>
+
+            <div class="mb-5">
                 <label for="mobile" class="block text-gray-700 font-medium mb-2">شماره موبایل</label>
                 <input type="text" id="mobile" name="mobile" value="{{ old('mobile') }}" required dir="ltr"
                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-left"
                     placeholder="09123456789">
-                <p class="text-xs text-gray-400 mt-2">از این شماره برای ورود پیامکی (OTP) استفاده خواهد شد.</p>
+                <p class="text-xs text-gray-400 mt-2">از این شماره برای بازیابی رمز عبور پیامکی استفاده خواهد شد.</p>
+            </div>
+
+            <div class="mb-5">
+                <label for="password" class="block text-gray-700 font-medium mb-2">رمز عبور</label>
+                <input type="password" id="password" name="password" required dir="ltr"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-left"
+                    placeholder="رمز عبور">
+            </div>
+
+            <div class="mb-5">
+                <label for="password_confirmation" class="block text-gray-700 font-medium mb-2">تکرار رمز عبور</label>
+                <input type="password" id="password_confirmation" name="password_confirmation" required dir="ltr"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-left"
+                    placeholder="تکرار رمز عبور">
             </div>
 
             <button type="submit" 
@@ -57,6 +77,12 @@
             <div class="mt-6 text-center text-sm text-gray-600">
                 قبلاً ثبت نام کرده‌اید؟ 
                 <a href="{{ url('/designer/login') }}" class="text-blue-600 hover:underline font-bold">ورود به پنل</a>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="{{ url('/') }}" class="text-gray-500 hover:text-gray-800 hover:underline text-sm font-medium transition duration-150 ease-in-out">
+                    بازگشت به صفحه اصلی &rarr;
+                </a>
             </div>
         </form>
     </div>

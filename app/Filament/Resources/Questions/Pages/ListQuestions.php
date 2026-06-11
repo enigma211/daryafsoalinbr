@@ -13,6 +13,12 @@ class ListQuestions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            \Filament\Actions\ExportAction::make()
+                ->label('خروجی اکسل / CSV')
+                ->icon('heroicon-o-document-arrow-down')
+                ->exporter(\App\Filament\Exports\QuestionExporter::class)
+                ->color('warning')
+                ->visible(fn () => filament()->getCurrentPanel()->getId() !== 'designer'),
             CreateAction::make(),
         ];
     }

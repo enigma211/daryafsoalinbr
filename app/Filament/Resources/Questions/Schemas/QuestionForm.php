@@ -18,6 +18,21 @@ class QuestionForm
     {
         return $schema
             ->components([
+                Section::make('یادداشت‌ها و بازخورد ناظر')
+                    ->description('دلایل رد شدن یا اصلاحات مورد نیاز در این بخش ثبت می‌شود.')
+                    ->schema([
+                        Textarea::make('reviewer_notes')
+                            ->hiddenLabel()
+                            ->disabled(fn () => filament()->getCurrentPanel()?->getId() === 'designer')
+                            ->columnSpanFull()
+                            ->placeholder('یادداشتی از سوی ناظر ثبت نشده است...'),
+                    ])
+                    ->icon('heroicon-o-chat-bubble-bottom-center-text')
+                    ->collapsible()
+                    ->collapsed(fn ($record) => empty($record?->reviewer_notes))
+                    ->visible(fn ($context) => $context === 'edit' || filament()->getCurrentPanel()?->getId() === 'admin')
+                    ->columnSpanFull(),
+
                 Section::make('متن سوال و پاسخ')
                     ->description('محتوای سوال و گزینه‌ها')
                     ->columnSpanFull()
@@ -33,58 +48,9 @@ class QuestionForm
                                             <span style="font-size: 1rem;">راهنمای درج فرمول‌های ریاضی</span>
                                         </div>
                                         <div style="line-height: 1.8; text-align: justify;">
-                                            کاربر گرامی؛ در محیط ویرایشگر زیر، فرمول‌ها عمداً به شکل <strong>متن خام</strong> (مثلاً <code>\$ V_u = 320 \$</code>) نمایش داده می‌شوند تا بتوانید اعداد و متغیرها را با کیبورد ویرایش کنید. هیچ جای نگرانی نیست! پس از ثبت و ذخیره سوال، سیستم این کدها را به صورت خودکار به فرمول‌های گرافیکی استاندارد تبدیل خواهد کرد.
+                                            کاربر گرامی؛ در محیط ویرایشگر زیر، فرمول‌ها عمداً به شکل <strong>متن خام</strong> (مثلاً <code>\$ V_u = 320 \$</code>) نمایش داده می‌شوند تا بتوانید اعداد و متغیرها را با کیبورد ویرایش کنید.
                                         </div>
                                     </div>
-                                    <div x-data x-init="
-                                        const autoSaveKey = 'draft_question_create';
-                                        
-                                        // 1. Restore Draft
-                                        const saved = localStorage.getItem(autoSaveKey);
-                                        if (saved && window.location.pathname.includes('/create')) {
-                                            setTimeout(() => {
-                                                if (confirm('یک پیش‌نویس ذخیره نشده یافت شد. آیا مایل به بازیابی اطلاعات هستید؟ (برای جلوگیری از حذف اطلاعات هنگام رفرش)')) {
-                                                    try {
-                                                        const parsedData = JSON.parse(saved);
-                                                        if (parsedData.text) \$wire.set('data.text', parsedData.text);
-                                                        if (parsedData.options) \$wire.set('data.options', parsedData.options);
-                                                        if (parsedData.exact_source) \$wire.set('data.exact_source', parsedData.exact_source);
-                                                    } catch (e) {
-                                                        console.error(e);
-                                                    }
-                                                } else {
-                                                    localStorage.removeItem(autoSaveKey);
-                                                }
-                                            }, 500);
-                                        }
-                                        
-                                        // 2. Auto-save every 5 seconds
-                                        if (window.location.pathname.includes('/create')) {
-                                            setInterval(() => {
-                                                try {
-                                                    const data = \$wire.get('data');
-                                                    if (data && (data.text || data.exact_source)) {
-                                                        const draft = {
-                                                            text: data.text,
-                                                            options: data.options,
-                                                            exact_source: data.exact_source
-                                                        };
-                                                        localStorage.setItem(autoSaveKey, JSON.stringify(draft));
-                                                    }
-                                                } catch (e) {
-                                                    console.error('Autosave error:', e);
-                                                }
-                                            }, 5000);
-                                            
-                                            // 3. Clear on save
-                                            const form = document.querySelector('form');
-                                            if (form) {
-                                                form.addEventListener('submit', () => {
-                                                    localStorage.removeItem(autoSaveKey);
-                                                });
-                                            }
-                                        }
-                                    "></div>
 HTML
                                 ))->columnSpanFull(),
 
@@ -94,6 +60,38 @@ HTML
                                 ->label('متن سوال')
                                 ->required()
                                 ->columnSpanFull(),
+
+                            \Filament\Forms\Components\Placeholder::make('text_preview')
+                                ->hiddenLabel()
+                                ->content(new \Illuminate\Support\HtmlString(<<<'HTML'
+                                    <div style="margin-bottom: 0.5rem; font-weight: bold; color: #374151;">پیش‌نمایش زنده خروجی سوال (با اعمال فرمول‌های ریاضی):</div>
+                                    <div x-data="{
+                                            text: $wire.$entangle('data.text', true),
+                                            renderKaTeX() {
+                                                if(window.renderMathInElement) {
+                                                    window.renderMathInElement(this.$refs.previewBox, {
+                                                        delimiters: [
+                                                            {left: '$$', right: '$$', display: true},
+                                                            {left: '$', right: '$', display: false},
+                                                            {left: '\\(', right: '\\)', display: false},
+                                                            {left: '\\[', right: '\\]', display: true}
+                                                        ],
+                                                        throwOnError: false
+                                                    });
+                                                }
+                                            }
+                                        }"
+                                        x-init="
+                                            $watch('text', value => {
+                                                $nextTick(() => renderKaTeX());
+                                            });
+                                            setTimeout(() => renderKaTeX(), 500);
+                                        "
+                                    >
+                                        <div x-ref="previewBox" x-html="text || '<span style=\'color: #94a3b8;\'>در حال تایپ...</span>'" style="padding: 1.5rem; border: 2px dashed #cbd5e1; border-radius: 0.5rem; min-height: 80px; background-color: #f8fafc; color: #1e293b; font-size: 1rem; line-height: 2; text-align: justify; direction: rtl;"></div>
+                                    </div>
+HTML
+                                ))->columnSpanFull(),
                                 
                             Repeater::make('options')
                                 ->relationship('options')
@@ -104,7 +102,12 @@ HTML
                                         ->hiddenLabel()
                                         ->placeholder('متن گزینه...')
                                         ->required()
+                                        ->live(debounce: 500)
                                         ->rows(1)
+                                        ->columnSpanFull(),
+                                    \Filament\Forms\Components\Placeholder::make('preview')
+                                        ->hiddenLabel()
+                                        ->view('components.option-preview')
                                         ->columnSpanFull(),
                                 ])
                                 ->grid(2)
@@ -131,6 +134,43 @@ HTML
                                     4 => 'گزینه ۴',
                                 ])
                                 ->required(),
+
+                            \Filament\Forms\Components\ViewField::make('descriptive_answer')
+                                ->view('components.ck-editor')
+                                ->label('توضیحات پاسخ (اختیاری)')
+                                ->columnSpanFull(),
+
+                            \Filament\Forms\Components\Placeholder::make('descriptive_answer_preview')
+                                ->hiddenLabel()
+                                ->content(new \Illuminate\Support\HtmlString(<<<'HTML'
+                                    <div style="margin-bottom: 0.5rem; font-weight: bold; color: #374151;">پیش‌نمایش توضیحات پاسخ (با اعمال فرمول‌های ریاضی):</div>
+                                    <div x-data="{
+                                            text: $wire.$entangle('data.descriptive_answer', true),
+                                            renderKaTeX() {
+                                                if(window.renderMathInElement) {
+                                                    window.renderMathInElement(this.$refs.previewBox, {
+                                                        delimiters: [
+                                                            {left: '$$', right: '$$', display: true},
+                                                            {left: '$', right: '$', display: false},
+                                                            {left: '\\(', right: '\\)', display: false},
+                                                            {left: '\\[', right: '\\]', display: true}
+                                                        ],
+                                                        throwOnError: false
+                                                    });
+                                                }
+                                            }
+                                        }"
+                                        x-init="
+                                            $watch('text', value => {
+                                                $nextTick(() => renderKaTeX());
+                                            });
+                                            setTimeout(() => renderKaTeX(), 500);
+                                        "
+                                    >
+                                        <div x-ref="previewBox" x-html="text || '<span style=\'color: #94a3b8;\'>توضیحاتی وارد نشده است...</span>'" style="padding: 1.5rem; border: 2px dashed #cbd5e1; border-radius: 0.5rem; min-height: 80px; background-color: #f8fafc; color: #1e293b; font-size: 1rem; line-height: 2; text-align: justify; direction: rtl;"></div>
+                                    </div>
+HTML
+                                ))->columnSpanFull(),
                                 
 
                             Repeater::make('attachments')

@@ -18,23 +18,25 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'mobile' => ['required', 'string', 'regex:/^09[0-9]{9}$/', 'unique:users,mobile'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
             'mobile.unique' => 'این شماره موبایل قبلاً ثبت شده است. لطفاً از بخش ورود وارد پنل شوید.',
             'mobile.regex' => 'فرمت شماره موبایل صحیح نیست (مثال: 09123456789).',
+            'email.unique' => 'این ایمیل قبلاً ثبت شده است.',
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'email' => $request->email,
             'mobile' => $request->mobile,
-            // Provide a random password and dummy email to satisfy DB constraints if any
-            'email' => 'user_' . Str::random(8) . '@example.com',
-            'password' => Hash::make(Str::random(16)), 
+            'password' => Hash::make($request->password), 
         ]);
 
         // Assign 'Question Designer' role by default
         $user->assignRole('Question Designer');
 
-        return redirect('/designer/login')->with('success', 'ثبت نام شما با موفقیت انجام شد. اکنون می‌توانید با شماره موبایل خود وارد شوید.');
+        return redirect('/designer/login')->with('success', 'ثبت نام شما با موفقیت انجام شد. اکنون می‌توانید وارد شوید.');
     }
 }

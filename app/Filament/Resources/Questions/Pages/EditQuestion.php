@@ -51,6 +51,11 @@ class EditQuestion extends EditRecord
                 ->action(function () {
                     $this->record->update(['current_status' => 'approved']);
                     $this->refreshFormData(['current_status']);
+                    \Filament\Notifications\Notification::make()
+                        ->title('سوال شما تایید نهایی شد')
+                        ->body('سوال با کد ' . $this->record->unique_code . ' با موفقیت تایید نهایی شد.')
+                        ->success()
+                        ->sendToDatabase($this->record->designer);
                 }),
 
             \Filament\Actions\Action::make('reject_or_revise')
@@ -70,7 +75,20 @@ class EditQuestion extends EditRecord
                     ]);
                     $this->record->update(['current_status' => 'needs_revision']);
                     $this->refreshFormData(['current_status']);
+                    
+                    \Filament\Notifications\Notification::make()
+                        ->title('سوال نیاز به اصلاح دارد')
+                        ->body('داور برای سوال ' . $this->record->unique_code . ' اصلاحیه ثبت کرد: ' . \Illuminate\Support\Str::limit($data['comment'], 50))
+                        ->danger()
+                        ->sendToDatabase($this->record->designer);
                 }),
+
+            \Filament\Actions\Action::make('print')
+                ->label('چاپ')
+                ->icon('heroicon-o-printer')
+                ->color('gray')
+                ->url(fn () => route('print.question', $this->record))
+                ->openUrlInNewTab(),
 
             ViewAction::make(),
             DeleteAction::make(),

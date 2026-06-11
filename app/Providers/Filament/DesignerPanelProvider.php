@@ -26,13 +26,18 @@ class DesignerPanelProvider extends PanelProvider
         return $panel
             ->id('designer')
             ->path('designer')
-            ->login(\App\Filament\Pages\Auth\OtpLogin::class)
+            ->login()
+            ->passwordReset(\App\Filament\Pages\Auth\SmsPasswordReset::class)
             ->brandName('داشبورد طراحان سوال')
             ->sidebarCollapsibleOnDesktop()
-            ->font('Vazirmatn', '/fonts/vazirmatn/Vazirmatn-font-face.css')
+            ->font('Vazirmatn', asset('fonts/vazirmatn/Vazirmatn-font-face.css'))
+            ->defaultAvatarProvider(\App\Providers\Filament\CustomAvatarProvider::class)
             ->renderHook(
                 \Filament\View\PanelsRenderHook::HEAD_END,
-                fn (): string => '<style>body, .fi-body, * { font-family: "Vazirmatn", Tahoma, sans-serif !important; }</style>'
+                fn (): string => '<style>
+                    :root { --font-family: "Vazirmatn", tahoma, sans-serif !important; }
+                    body, .fi-body { font-family: "Vazirmatn", tahoma, sans-serif !important; }
+                </style>'
             )
             ->colors([
                 'primary' => Color::Amber,
@@ -40,6 +45,18 @@ class DesignerPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Designer/Resources'), for: 'App\Filament\Designer\Resources')
             ->resources([
                 \App\Filament\Resources\Questions\QuestionResource::class,
+            ])
+            ->navigationItems([
+                \Filament\Navigation\NavigationItem::make('ارسال سوال')
+                    ->url(fn (): string => \App\Filament\Resources\Questions\QuestionResource::getUrl('create'))
+                    ->icon('heroicon-o-plus-circle')
+                    ->isActiveWhen(fn () => request()->routeIs('filament.designer.resources.questions.create'))
+                    ->sort(1),
+                \Filament\Navigation\NavigationItem::make('مشاهده سوالات')
+                    ->url(fn (): string => \App\Filament\Resources\Questions\QuestionResource::getUrl('index'))
+                    ->icon('heroicon-o-rectangle-stack')
+                    ->isActiveWhen(fn () => request()->routeIs('filament.designer.resources.questions.index') || request()->routeIs('filament.designer.resources.questions.edit') || request()->routeIs('filament.designer.resources.questions.view'))
+                    ->sort(2),
             ])
             ->discoverPages(in: app_path('Filament/Designer/Pages'), for: 'App\Filament\Designer\Pages')
             ->pages([

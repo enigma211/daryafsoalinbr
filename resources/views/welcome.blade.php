@@ -29,7 +29,7 @@
         <!-- Logo -->
         <div class="flex justify-center mb-8 relative z-10">
             <!-- Using a placeholder logo or the uploaded logo -->
-            <img src="{{ asset('images/logo.png') }}" alt="لوگو مقررات ملی" class="w-32 h-32 object-contain bg-white rounded-full p-2 shadow-lg" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Emblem_of_Iran.svg/200px-Emblem_of_Iran.svg.png'">
+            <img src="{{ asset('images/logo.png') }}" alt="لوگو مقررات ملی" class="w-32 h-32 object-contain bg-white rounded-full p-2 shadow-lg">
         </div>
 
         <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 relative z-10">

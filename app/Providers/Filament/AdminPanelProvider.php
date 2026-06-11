@@ -27,13 +27,18 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login(\App\Filament\Pages\Auth\OtpLogin::class)
+            ->login()
+            ->passwordReset(\App\Filament\Pages\Auth\SmsPasswordReset::class)
             ->brandName('سامانه بانک سوالات')
             ->sidebarCollapsibleOnDesktop()
-            ->font('Vazirmatn', '/fonts/vazirmatn/Vazirmatn-font-face.css')
+            ->font('Vazirmatn', asset('fonts/vazirmatn/Vazirmatn-font-face.css'))
+            ->defaultAvatarProvider(\App\Providers\Filament\CustomAvatarProvider::class)
             ->renderHook(
                 \Filament\View\PanelsRenderHook::HEAD_END,
-                fn (): string => '<style>body, .fi-body, * { font-family: "Vazirmatn", Tahoma, sans-serif !important; }</style>'
+                fn (): string => '<style>
+                    :root { --font-family: "Vazirmatn", tahoma, sans-serif !important; }
+                    body, .fi-body { font-family: "Vazirmatn", tahoma, sans-serif !important; }
+                </style>'
             )
             ->colors([
                 'primary' => Color::Blue,
@@ -60,6 +65,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->databaseNotifications();
     }
 }

@@ -17,6 +17,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class QuestionResource extends Resource
 {
@@ -25,17 +26,51 @@ class QuestionResource extends Resource
     protected static ?string $modelLabel = 'سوال';
     public static function getPluralModelLabel(): string
     {
-        return filament()->getCurrentPanel()->getId() === 'designer' ? 'ارسال سوال' : 'بانک سوالات';
+        return filament()->getCurrentPanel()->getId() === 'designer' ? 'سوالات من' : 'بانک سوالات';
     }
 
     public static function getNavigationLabel(): string
     {
-        return filament()->getCurrentPanel()->getId() === 'designer' ? 'ارسال سوال' : 'بانک سوالات';
+        return filament()->getCurrentPanel()->getId() === 'designer' ? 'مشاهده سوالات' : 'بانک سوالات';
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        if (filament()->getCurrentPanel()->getId() === 'designer') {
+            return false;
+        }
+
+        return parent::shouldRegisterNavigation();
     }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'unique_code';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['unique_code', 'text', 'designer.name'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return 'سوال ' . $record->unique_code;
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'طراح' => $record->designer->name ?? 'نامشخص',
+            'وضعیت' => match ($record->current_status) {
+                'approved' => 'تایید شده',
+                'awaiting_review' => 'منتظر داوری',
+                'scientific_review' => 'داوری علمی',
+                'regulations_review' => 'داوری مقررات',
+                'needs_revision' => 'نیاز به اصلاح',
+                default => 'پیش‌نویس',
+            },
+        ];
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -77,9 +112,10 @@ class QuestionResource extends Resource
                 SoftDeletingScope::class,
             ]);
 
-        $user = auth()->user();
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
 
-        if (auth()->check()) {
+        if (Auth::check()) {
             // Super Admin and Exam Manager see all
             if ($user->hasRole(['Super Admin', 'Exam Manager'])) {
                 return $query;

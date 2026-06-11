@@ -13,6 +13,12 @@ class ViewQuestion extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            \Filament\Actions\Action::make('print')
+                ->label('چاپ')
+                ->icon('heroicon-o-printer')
+                ->color('gray')
+                ->url(fn () => route('print.question', $this->record))
+                ->openUrlInNewTab(),
             EditAction::make(),
         ];
     }

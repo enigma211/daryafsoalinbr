@@ -27,6 +27,16 @@ class UsersTable
                     ->searchable(),
                 TextColumn::make('roles.name')
                     ->label('نقش‌ها')
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'Super Admin' => 'مدیر کل',
+                        'Exam Manager' => 'مدیر آزمون',
+                        'Field Secretary' => 'دبیر رشته',
+                        'Operator' => 'اپراتور',
+                        'Question Designer' => 'طراح سوال',
+                        'Regulations Reviewer' => 'ناظر مقررات ملی',
+                        'Scientific Reviewer' => 'ناظر علمی',
+                        default => $state,
+                    })
                     ->badge(),
                 TextColumn::make('created_at')
                     ->label('تاریخ عضویت')

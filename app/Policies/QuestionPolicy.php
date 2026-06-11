@@ -64,9 +64,8 @@ class QuestionPolicy
         }
 
         if ($user->hasRole(['Scientific Reviewer', 'Regulations Reviewer'])) {
-            // Reviewers can't edit the question itself directly, they just add comments, 
-            // but we might allow them to update status. For now, deny edit on the form.
-            return false;
+            // Reviewers can update the question to add reviewer_notes and change status
+            return true;
         }
 
         return false;

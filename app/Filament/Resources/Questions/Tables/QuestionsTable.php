@@ -27,40 +27,11 @@ class QuestionsTable
                     ->label('مبحث مقررات')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('edition')
-                    ->label('ویرایش')
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'اول' => 'ویرایش اول',
-                        'دوم' => 'ویرایش دوم',
-                        'سوم' => 'ویرایش سوم',
-                        'چهارم' => 'ویرایش چهارم',
-                        'پنجم' => 'ویرایش پنجم',
-                        default => $state ?? 'نامشخص',
-                    })
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('type')
-                    ->label('نوع سوال')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'multiple_choice' => 'چهار گزینه‌ای',
-                        'descriptive' => 'تشریحی',
-                        default => $state,
-                    })
+                TextColumn::make('text')
+                    ->label('متن سوال')
+                    ->formatStateUsing(fn ($state) => \Illuminate\Support\Str::limit(strip_tags($state), 60))
                     ->searchable(),
-                TextColumn::make('difficulty_level')
-                    ->label('درجه سختی')
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'easy' => 'آسان',
-                        'medium' => 'متوسط',
-                        'hard' => 'سخت',
-                        default => 'نامشخص',
-                    })
-                    ->badge()
-                    ->colors([
-                        'success' => 'easy',
-                        'warning' => 'medium',
-                        'danger' => 'hard',
-                    ]),
+
                 TextColumn::make('current_status')
                     ->label('وضعیت')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
@@ -115,7 +86,11 @@ class QuestionsTable
                     ->icon('heroicon-o-paper-airplane')
                     ->color('info')
                     ->requiresConfirmation()
-                    ->visible(fn ($record) => in_array($record->current_status, ['draft', 'needs_revision']) && auth()->user()->can('update', $record))
+                    ->visible(function ($record) {
+                        /** @var \App\Models\User $user */
+                        $user = \Illuminate\Support\Facades\Auth::user();
+                        return in_array($record->current_status, ['draft', 'needs_revision']) && $user->can('update', $record);
+                    })
                     ->action(fn ($record) => $record->update(['current_status' => 'awaiting_review'])),
 
                 \Filament\Actions\Action::make('scientific_review_approve')
@@ -123,7 +98,11 @@ class QuestionsTable
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn ($record) => in_array($record->current_status, ['awaiting_review', 'scientific_review']) && auth()->user()->hasRole(['Super Admin', 'Exam Manager', 'Scientific Reviewer']))
+                    ->visible(function ($record) {
+                        /** @var \App\Models\User $user */
+                        $user = \Illuminate\Support\Facades\Auth::user();
+                        return in_array($record->current_status, ['awaiting_review', 'scientific_review']) && $user->hasRole(['Super Admin', 'Exam Manager', 'Scientific Reviewer']);
+                    })
                     ->action(fn ($record) => $record->update(['current_status' => 'regulations_review'])),
 
                 \Filament\Actions\Action::make('regulations_review_approve')
@@ -131,8 +110,19 @@ class QuestionsTable
                     ->icon('heroicon-o-shield-check')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn ($record) => $record->current_status === 'regulations_review' && auth()->user()->hasRole(['Super Admin', 'Exam Manager', 'Regulations Reviewer']))
-                    ->action(fn ($record) => $record->update(['current_status' => 'approved'])),
+                    ->visible(function ($record) {
+                        /** @var \App\Models\User $user */
+                        $user = \Illuminate\Support\Facades\Auth::user();
+                        return $record->current_status === 'regulations_review' && $user->hasRole(['Super Admin', 'Exam Manager', 'Regulations Reviewer']);
+                    })
+                    ->action(function ($record) {
+                        $record->update(['current_status' => 'approved']);
+                        \Filament\Notifications\Notification::make()
+                            ->title('سوال شما تایید نهایی شد')
+                            ->body('سوال با کد ' . $record->unique_code . ' با موفقیت تایید نهایی شد.')
+                            ->success()
+                            ->sendToDatabase($record->designer);
+                    }),
 
                 \Filament\Actions\Action::make('reject_or_revise')
                     ->label('رد / نیاز به اصلاح')
@@ -143,15 +133,26 @@ class QuestionsTable
                             ->label('دلیل رد یا اصلاحات مورد نیاز')
                             ->required(),
                     ])
-                    ->visible(fn ($record) => in_array($record->current_status, ['awaiting_review', 'scientific_review', 'regulations_review']) && auth()->user()->hasRole(['Super Admin', 'Exam Manager', 'Scientific Reviewer', 'Regulations Reviewer']))
+                    ->visible(function ($record) {
+                        /** @var \App\Models\User $user */
+                        $user = \Illuminate\Support\Facades\Auth::user();
+                        return in_array($record->current_status, ['awaiting_review', 'scientific_review', 'regulations_review']) && $user->hasRole(['Super Admin', 'Exam Manager', 'Scientific Reviewer', 'Regulations Reviewer']);
+                    })
                     ->action(function (array $data, $record) {
                         // Add comment
                         $record->comments()->create([
-                            'user_id' => auth()->id(),
+                            'user_id' => \Illuminate\Support\Facades\Auth::id(),
                             'comment' => $data['comment'],
                         ]);
                         // Change status
                         $record->update(['current_status' => 'needs_revision']);
+                        
+                        // Notify designer
+                        \Filament\Notifications\Notification::make()
+                            ->title('سوال نیاز به اصلاح دارد')
+                            ->body('داور برای سوال ' . $record->unique_code . ' اصلاحیه ثبت کرد: ' . \Illuminate\Support\Str::limit($data['comment'], 50))
+                            ->danger()
+                            ->sendToDatabase($record->designer);
                     }),
 
                 ViewAction::make(),
@@ -163,7 +164,8 @@ class QuestionsTable
                         ->label('خروجی اکسل / CSV')
                         ->icon('heroicon-o-document-arrow-down')
                         ->exporter(\App\Filament\Exports\QuestionExporter::class)
-                        ->color('warning'),
+                        ->color('warning')
+                        ->visible(fn () => filament()->getCurrentPanel()->getId() !== 'designer'),
 
                     \Filament\Actions\BulkAction::make('export_exam')
                         ->label('چاپ برگه آزمون (PDF)')
@@ -173,7 +175,8 @@ class QuestionsTable
                             $ids = $records->pluck('id')->join(',');
                             return redirect()->route('exam.print', ['ids' => $ids]);
                         })
-                        ->deselectRecordsAfterCompletion(),
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => filament()->getCurrentPanel()->getId() !== 'designer'),
                         
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),

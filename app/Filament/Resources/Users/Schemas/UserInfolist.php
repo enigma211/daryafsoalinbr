@@ -11,18 +11,32 @@ class UserInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('name'),
+                TextEntry::make('name')
+                    ->label('نام و نام خانوادگی'),
                 TextEntry::make('email')
-                    ->label('Email address'),
-                TextEntry::make('email_verified_at')
-                    ->dateTime()
+                    ->label('ایمیل'),
+                TextEntry::make('mobile')
+                    ->label('موبایل')
                     ->placeholder('-'),
+                TextEntry::make('roles.name')
+                    ->label('نقش‌ها')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'Super Admin' => 'مدیر کل',
+                        'Exam Manager' => 'مدیر آزمون',
+                        'Field Secretary' => 'دبیر رشته',
+                        'Operator' => 'اپراتور',
+                        'Question Designer' => 'طراح سوال',
+                        'Regulations Reviewer' => 'ناظر مقررات ملی',
+                        'Scientific Reviewer' => 'ناظر علمی',
+                        default => $state,
+                    }),
                 TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
+                    ->label('تاریخ عضویت')
+                    ->formatStateUsing(fn ($state) => $state ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($state))->format('Y/m/d H:i:s') : '-'),
                 TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-            ]);
+                    ->label('تاریخ ویرایش')
+                    ->formatStateUsing(fn ($state) => $state ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($state))->format('Y/m/d H:i:s') : '-'),
+            ])->columns(2);
     }
 }

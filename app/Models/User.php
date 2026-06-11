@@ -68,4 +68,14 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsToMany(Category::class);
     }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class, 'user_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(QuestionComment::class, 'user_id');
+    }
 }

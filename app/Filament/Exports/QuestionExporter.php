@@ -85,7 +85,9 @@ class QuestionExporter extends Exporter
                     default => $state,
                 }),
             ExportColumn::make('designer.name')->label('نام طراح'),
-            ExportColumn::make('created_at')->label('تاریخ ثبت')->date('Y/m/d'),
+            ExportColumn::make('created_at')
+                ->label('تاریخ ثبت')
+                ->formatStateUsing(fn ($state) => $state ? \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($state))->format('Y/m/d') : ''),
         ];
     }
 
