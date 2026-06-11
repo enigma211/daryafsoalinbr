@@ -1,9 +1,19 @@
 <?php
-require __DIR__ . '/../../vendor/autoload.php';
-$app = require_once __DIR__ . '/../../bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-for ($i = 1; $i <= 24; $i++) {
-    \App\Models\Category::firstOrCreate(['topic' => 'مبحث ' . $i]);
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\Category;
+
+class TopicsSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        for ($i = 1; $i <= 24; $i++) {
+            Category::firstOrCreate(['topic' => 'مبحث ' . $i]);
+        }
+    }
 }
-echo "Done";
