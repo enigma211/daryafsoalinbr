@@ -12,7 +12,10 @@ class CreateQuestion extends CreateRecord
 
     protected function beforeCreate(): void
     {
-        $settings = \App\Models\SystemSetting::firstOrCreate(['id' => 1]);
+        $settings = \App\Models\SystemSetting::firstOrCreate(
+            ['id' => 1],
+            ['max_questions_per_day' => 50, 'question_cooldown_seconds' => 30]
+        );
         $user = \Illuminate\Support\Facades\Auth::user();
 
         // Check max per day
