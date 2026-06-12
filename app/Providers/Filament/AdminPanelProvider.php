@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->passwordReset(\App\Filament\Pages\Auth\SmsPasswordReset::class)
-            ->brandName('سامانه بانک سوالات')
+            ->brandName('سامانه دریافت سوالات')
             ->sidebarCollapsibleOnDesktop()
             ->font('Vazirmatn', asset('fonts/vazirmatn/Vazirmatn-font-face.css'))
             ->defaultAvatarProvider(\App\Providers\Filament\CustomAvatarProvider::class)

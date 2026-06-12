@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سامانه بانک سوالات مقررات ملی ساختمان</title>
+    <title>سامانه دریافت سوالات مقررات ملی ساختمان</title>
     <link href="{{ asset('fonts/vazirmatn/Vazirmatn-font-face.css') }}" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -33,7 +33,7 @@
         </div>
 
         <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 relative z-10">
-            سامانه بانک سوالات
+            سامانه دریافت سوالات
         </h1>
         <h2 class="text-xl text-gray-600 mb-10 relative z-10">
             دفتر مقررات ملی و کنترل ساختمان
