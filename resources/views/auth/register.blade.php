@@ -31,13 +31,13 @@
         @endif
 
         @if (session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-700 p-6 rounded-xl mb-6 text-center shadow-sm">
-                <svg class="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 1rem; padding: 2rem; text-align: center; margin-bottom: 1.5rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                <svg style="width: 5rem; height: 5rem; color: #22c55e; margin: 0 auto 1rem auto;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <h3 class="text-xl font-bold mb-3">ثبت نام موفق</h3>
-                <p class="mb-6 font-medium">{{ session('success') }}</p>
-                <a href="{{ url('/designer/login') }}" class="inline-block w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+                <h3 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.75rem; color: #166534;">ثبت نام موفق</h3>
+                <p style="margin-bottom: 2rem; color: #15803d; font-weight: 500; font-size: 1.1rem;">{{ session('success') }}</p>
+                <a href="{{ url('/designer/login') }}" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300" style="display: block;">
                     ورود به پنل کاربری طراحان
                 </a>
             </div>
