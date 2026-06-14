@@ -56,6 +56,19 @@ class CreateQuestion extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = \Illuminate\Support\Facades\Auth::id();
+        $data['current_status'] = 'awaiting_review';
         return $data;
+    }
+
+    protected function getCreateFormAction(): \Filament\Actions\Action
+    {
+        return parent::getCreateFormAction()
+            ->label('ارسال برای داوری');
+    }
+
+    protected function getCreateAnotherFormAction(): \Filament\Actions\Action
+    {
+        return parent::getCreateAnotherFormAction()
+            ->hidden();
     }
 }

@@ -45,6 +45,7 @@ class DesignerPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Designer/Resources'), for: 'App\Filament\Designer\Resources')
             ->resources([
                 \App\Filament\Resources\Questions\QuestionResource::class,
+                \App\Filament\Resources\Tickets\TicketResource::class,
             ])
             ->navigationItems([
                 \Filament\Navigation\NavigationItem::make('ارسال سوال')
