@@ -38,7 +38,6 @@ HTML
 
                         FileUpload::make('word_file')
                             ->label('بارگذاری فایل Word تکمیل‌شده')
-                            ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                             ->maxSize(10240)
                             ->reactive()
                             ->afterStateUpdated(function ($state, $set, $get, $livewire) {
